@@ -39,19 +39,15 @@ pixel_size@TXDiagnosticMaps: 0.2
 config:
   class: File
   path: config.yml
-  format: desc:YamlFile
+  format: "desc:YamlFile"
 
 # Input files
 shear_catalog:
   class: File
   path: https://portal.nersc.gov/project/lsst/WeakLensing/mock_shear_catalog.fits
-  format: desc:MetacalCatalog
+  format: "desc:MetacalCatalog"
 
 photometry_catalog:
   class: File
   path: https://portal.nersc.gov/project/lsst/WeakLensing/mock_photometry_catalog.hdf
-  format: desc:HDFFile
-
-
-$namespaces:
-    desc: https://www.lsst-desc.org/formats/
+  format: "desc:HDFFile"
