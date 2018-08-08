@@ -5,8 +5,9 @@ cwlVersion: v1.0
 label: LSST DESC 3x2pt analysis pipeline
 doc: |
   # LSST DESC 3x2pt analysis pipeline
-  ![txpipe](https://github.com/EiffL/TXPipe/raw/master/doc/txlogo.png)  
+  ![txpipe](https://github.com/EiffL/TXPipe/raw/master/doc/txlogo.png)
 
+  ## Intro
   This is a collection of modules for the DESC 3x2pt pipeline.
   We will build up the modules needed for the analysis as shown in the Pipelines repository.
   It builds on the ceci repository for the infrastructure.
