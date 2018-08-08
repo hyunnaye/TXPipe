@@ -25,7 +25,7 @@ inputs:
     type: string
   config:
     doc: Configuration file
-    format: desc:YamlFile
+    format: "desc:YamlFile"
     inputBinding: {loadContents: false, prefix: --config, separate: true, shellQuote: true}
     label: config
     type: File
@@ -37,7 +37,7 @@ inputs:
     type: int
   response_model:
     doc: Some documentation about the input
-    format: desc:HDFFile
+    format: "desc:HDFFile"
     inputBinding: {loadContents: false, prefix: --response_model, separate: true,
       shellQuote: true}
     label: response_model
@@ -59,13 +59,13 @@ label: TXProtoDC2Mock
 outputs:
   photometry_catalog:
     doc: Some results produced by the pipeline element
-    format: desc:HDFFile
+    format: "desc:HDFFile"
     label: photometry_catalog
     outputBinding: {glob: photometry_catalog.hdf}
     type: File
   shear_catalog:
     doc: Some results produced by the pipeline element
-    format: desc:MetacalCatalog
+    format: "desc:MetacalCatalog"
     label: shear_catalog
     outputBinding: {glob: shear_catalog.fits}
     type: File

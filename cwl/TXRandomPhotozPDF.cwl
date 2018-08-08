@@ -29,7 +29,7 @@ inputs:
     type: int
   config:
     doc: Configuration file
-    format: desc:YamlFile
+    format: "desc:YamlFile"
     inputBinding: {loadContents: false, prefix: --config, separate: true, shellQuote: true}
     label: config
     type: File
@@ -40,7 +40,7 @@ inputs:
     type: int
   photometry_catalog:
     doc: Some documentation about the input
-    format: desc:HDFFile
+    format: "desc:HDFFile"
     inputBinding: {loadContents: false, prefix: --photometry_catalog, separate: true,
       shellQuote: true}
     label: photometry_catalog
@@ -54,7 +54,7 @@ label: TXRandomPhotozPDF
 outputs:
   photoz_pdfs:
     doc: Some results produced by the pipeline element
-    format: desc:PhotozPDFFile
+    format: "desc:PhotozPDFFile"
     label: photoz_pdfs
     outputBinding: {glob: photoz_pdfs.hdf}
     type: File
