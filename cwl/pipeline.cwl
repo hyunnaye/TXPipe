@@ -152,7 +152,7 @@ s:license: https://spdx.org/licenses/BSD-3-Clause.html
 
 $namespaces:
   s: https://schema.org/
-    desc: https://www.lsst-desc.org/formats/
+  desc: https://www.lsst-desc.org/formats/
 
 $schemas:
  - https://schema.org/docs/schema_org_rdfa.html
