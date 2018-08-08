@@ -1,0 +1,11 @@
+config:
+    class: File
+    path: https://raw.githubusercontent.com/EiffL/TXPipe/master/test/config.yml
+
+photometry_catalog:
+    class: File
+    path: https://portal.nersc.gov/project/lsst/WeakLensing/mock_photometry_catalog.hdf
+
+shear_catalog:
+    class: File
+    path: https://portal.nersc.gov/project/lsst/WeakLensing/mock_shear_catalog.fits
