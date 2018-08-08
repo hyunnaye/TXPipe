@@ -8,6 +8,9 @@ class: CommandLineTool
 cwlVersion: v1.0
 doc: "\n    Naively stack photo-z PDFs in bins according to previous selections.\n\
   \n    "
+hints:
+  - class: DockerRequirement
+    dockerPull: eiffl/txpipe
 id: TXPhotozStack
 inputs:
   chunk_rows:

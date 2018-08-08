@@ -10,6 +10,10 @@ doc: "\n    This is a placeholder for an actual photoz pipeline!\n\n    At the m
   \ it just randomly generates a log-normal PDF for each object.\n    Hopefully the\
   \ real pipeline will be more accurate than that.\n\n    "
 id: TXRandomPhotozPDF
+hints:
+  - class: DockerRequirement
+    dockerPull: eiffl/txpipe
+
 inputs:
   bands:
     default: ugriz

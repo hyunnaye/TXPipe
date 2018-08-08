@@ -12,6 +12,10 @@ doc: "\n    For now, this Pipeline Stage computes a depth map using the DR1 meth
   \ for use in systematics tests and covariance mode projection.\n\n    DM may in\
   \ the future provide tools we can use in place of the methods\n    used here, but\
   \ not on the DC2 timescale.\n\n    "
+hints:
+  - class: DockerRequirement
+    dockerPull: eiffl/txpipe
+
 id: TXDiagnosticMaps
 inputs:
   chunk_rows:

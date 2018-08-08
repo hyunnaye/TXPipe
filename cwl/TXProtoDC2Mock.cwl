@@ -11,6 +11,10 @@ doc: "\n    This stage simulates metacal data and metacalibrated\n    photometry
   \ and obs-catalog simulations.\n\n    This is mainly useful for testing infrastructure\
   \ in advance\n    of the DC2 catalogs being available, but might also be handy\n\
   \    for starting from a purer simulation.\n    "
+hints:
+  - class: DockerRequirement
+    dockerPull: eiffl/txpipe
+
 id: TXProtoDC2Mock
 inputs:
   cat_name:

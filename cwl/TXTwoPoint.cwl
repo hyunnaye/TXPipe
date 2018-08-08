@@ -6,6 +6,10 @@ arguments:
 baseCommand: python3
 class: CommandLineTool
 cwlVersion: v1.0
+hints:
+  - class: DockerRequirement
+    dockerPull: eiffl/txpipe
+
 id: TXTwoPoint
 inputs:
   bin_slop:

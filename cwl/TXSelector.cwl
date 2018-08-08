@@ -8,6 +8,10 @@ class: CommandLineTool
 cwlVersion: v1.0
 doc: "\n    Selects and constructs metacal calibrations for tomographic bins of objects\n\
   \n    "
+hints:
+  - class: DockerRequirement
+    dockerPull: eiffl/txpipe
+
 id: TXSelector
 inputs:
   T_cut:
