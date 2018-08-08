@@ -2,7 +2,12 @@
 
 class: Workflow
 cwlVersion: v1.0
-doc: "LSST DESC 3x2pt analysis pipeline"
+label: LSST DESC 3x2pt analysis pipeline
+doc: |
+  This is a collection of modules for the DESC 3x2pt pipeline.
+  We will build up the modules needed for the analysis as shown in the Pipelines repository.
+  It builds on the ceci repository for the infrastructure.
+
 inputs:
   Mstar@TXRandomCat: {default: 23.0, id: Mstar@TXRandomCat, label: Mstar, type: float}
   T_cut@TXSelector: {id: T_cut@TXSelector, label: T_cut, type: float}
@@ -118,6 +123,37 @@ steps:
       verbose: verbose@TXTwoPoint}
     out: [twopoint_data]
     run: TXTwoPoint.cwl
+
+
+s:author:
+  - class: s:Person
+    s:identifier:  https://orcid.org/0000-0001-9789-9646
+    s:email: mailto:joe.s.email
+    s:name: Joe Zuntz
+
+s:contributor:
+  - class: s:Person
+    s:email: mailto:emily.s.email
+    s:name: Emily Longley
+
+s:contributor:
+  - class: s:Person
+    s:identifier: http://orcid.org/0000-0001-7956-0542
+    s:email: mailto:francois.lanusse@gmail.com
+    s:name: Francois Lanusse
+
+s:contributor:
+  - class: s:Person
+    s:identifier: http://orcid.org/0000-0001-1234-0000
+    s:email: mailto:chichway.s.email
+    s:name: Chichway Chang
+
+s:codeRepository: https://github.com/LSSTDESC/TXPipe
+s:license: https://spdx.org/licenses/BSD-3-Clause.html
+
+
+
+
 
 
 $namespaces:
