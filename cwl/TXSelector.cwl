@@ -27,7 +27,7 @@ inputs:
     type: int
   config:
     doc: Configuration file
-    format: YamlFile
+    format: desc:YamlFile
     inputBinding: {loadContents: false, prefix: --config, separate: true, shellQuote: true}
     label: config
     type: File
@@ -44,7 +44,7 @@ inputs:
     type: int
   photoz_pdfs:
     doc: Some documentation about the input
-    format: PhotozPDFFile
+    format: desc:PhotozPDFFile
     inputBinding: {loadContents: false, prefix: --photoz_pdfs, separate: true, shellQuote: true}
     label: photoz_pdfs
     type: File
@@ -55,7 +55,7 @@ inputs:
     type: float
   shear_catalog:
     doc: Some documentation about the input
-    format: MetacalCatalog
+    format: desc:MetacalCatalog
     inputBinding: {loadContents: false, prefix: --shear_catalog, separate: true, shellQuote: true}
     label: shear_catalog
     type: File
@@ -69,7 +69,10 @@ label: TXSelector
 outputs:
   tomography_catalog:
     doc: Some results produced by the pipeline element
-    format: TomographyCatalog
+    format: desc:TomographyCatalog
     label: tomography_catalog
     outputBinding: {glob: tomography_catalog.hdf}
     type: File
+
+$namespaces:
+    desc: https://www.lsst-desc.org/formats/

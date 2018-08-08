@@ -21,19 +21,19 @@ inputs:
     type: int
   config:
     doc: Configuration file
-    format: YamlFile
+    format: desc:YamlFile
     inputBinding: {loadContents: false, prefix: --config, separate: true, shellQuote: true}
     label: config
     type: File
   photoz_pdfs:
     doc: Some documentation about the input
-    format: PhotozPDFFile
+    format: desc:PhotozPDFFile
     inputBinding: {loadContents: false, prefix: --photoz_pdfs, separate: true, shellQuote: true}
     label: photoz_pdfs
     type: File
   tomography_catalog:
     doc: Some documentation about the input
-    format: TomographyCatalog
+    format: desc:TomographyCatalog
     inputBinding: {loadContents: false, prefix: --tomography_catalog, separate: true,
       shellQuote: true}
     label: tomography_catalog
@@ -42,7 +42,10 @@ label: TXPhotozStack
 outputs:
   photoz_stack:
     doc: Some results produced by the pipeline element
-    format: HDFFile
+    format: desc:HDFFile
     label: photoz_stack
     outputBinding: {glob: photoz_stack.hdf}
     type: File
+
+$namespaces:
+    desc: https://www.lsst-desc.org/formats/

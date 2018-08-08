@@ -27,7 +27,7 @@ inputs:
     type: {items: int, type: array}
   config:
     doc: Configuration file
-    format: YamlFile
+    format: desc:YamlFile
     inputBinding: {loadContents: false, prefix: --config, separate: true, shellQuote: true}
     label: config
     type: File
@@ -64,7 +64,7 @@ inputs:
     type: int
   random_cats:
     doc: Some documentation about the input
-    format: RandomsCatalog
+    format: desc:RandomsCatalog
     inputBinding: {loadContents: false, prefix: --random_cats, separate: true, shellQuote: true}
     label: random_cats
     type: File
@@ -76,13 +76,13 @@ inputs:
     type: string
   shear_catalog:
     doc: Some documentation about the input
-    format: MetacalCatalog
+    format: desc:MetacalCatalog
     inputBinding: {loadContents: false, prefix: --shear_catalog, separate: true, shellQuote: true}
     label: shear_catalog
     type: File
   tomography_catalog:
     doc: Some documentation about the input
-    format: TomographyCatalog
+    format: desc:TomographyCatalog
     inputBinding: {loadContents: false, prefix: --tomography_catalog, separate: true,
       shellQuote: true}
     label: tomography_catalog
@@ -97,7 +97,10 @@ label: TXTwoPoint
 outputs:
   twopoint_data:
     doc: Some results produced by the pipeline element
-    format: HDFFile
+    format: desc:HDFFile
     label: twopoint_data
     outputBinding: {glob: twopoint_data.hdf}
     type: File
+
+$namespaces:
+    desc: https://www.lsst-desc.org/formats/

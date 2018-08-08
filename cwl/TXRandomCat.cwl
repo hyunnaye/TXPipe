@@ -26,7 +26,7 @@ inputs:
     type: float
   config:
     doc: Configuration file
-    format: YamlFile
+    format: desc:YamlFile
     inputBinding: {loadContents: false, prefix: --config, separate: true, shellQuote: true}
     label: config
     type: File
@@ -38,7 +38,7 @@ inputs:
     type: float
   diagnostic_maps:
     doc: Some documentation about the input
-    format: DiagnosticMaps
+    format: desc:DiagnosticMaps
     inputBinding: {loadContents: false, prefix: --diagnostic_maps, separate: true,
       shellQuote: true}
     label: diagnostic_maps
@@ -51,7 +51,7 @@ inputs:
     type: float
   tomography_catalog:
     doc: Some documentation about the input
-    format: TomographyCatalog
+    format: desc:TomographyCatalog
     inputBinding: {loadContents: false, prefix: --tomography_catalog, separate: true,
       shellQuote: true}
     label: tomography_catalog
@@ -60,7 +60,10 @@ label: TXRandomCat
 outputs:
   random_cats:
     doc: Some results produced by the pipeline element
-    format: RandomsCatalog
+    format: desc:RandomsCatalog
     label: random_cats
     outputBinding: {glob: random_cats.hdf}
     type: File
+
+$namespaces:
+    desc: https://www.lsst-desc.org/formats/

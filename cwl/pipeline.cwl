@@ -22,7 +22,7 @@ inputs:
     label: chunk_rows, type: int}
   chunk_rows@TXSelector: {default: 10000, id: chunk_rows@TXSelector, label: chunk_rows,
     type: int}
-  config: {format: YamlFile, id: config, label: config, type: File}
+  config: {format: desc:YamlFile, id: config, label: config, type: File}
   cores_per_task@TXTwoPoint: {default: 20, id: cores_per_task@TXTwoPoint, label: cores_per_task,
     type: int}
   dec_max@TXDiagnosticMaps: {default: .nan, id: dec_max@TXDiagnosticMaps, label: dec_max,
@@ -40,7 +40,7 @@ inputs:
   nbins@TXTwoPoint: {default: 20, id: nbins@TXTwoPoint, label: nbins, type: int}
   nside@TXDiagnosticMaps: {default: 0, id: nside@TXDiagnosticMaps, label: nside, type: int}
   nz@TXRandomPhotozPDF: {id: nz@TXRandomPhotozPDF, label: nz, type: int}
-  photometry_catalog: {format: HDFFile, id: photometry_catalog, label: photometry_catalog,
+  photometry_catalog: {format: desc:HDFFile, id: photometry_catalog, label: photometry_catalog,
     type: File}
   pixel_size@TXDiagnosticMaps: {default: .nan, id: pixel_size@TXDiagnosticMaps, label: pixel_size,
     type: float}
@@ -53,7 +53,7 @@ inputs:
   s2n_cut@TXSelector: {id: s2n_cut@TXSelector, label: s2n_cut, type: float}
   sep_units@TXTwoPoint: {default: arcmin, id: sep_units@TXTwoPoint, label: sep_units,
     type: string}
-  shear_catalog: {format: MetacalCatalog, id: shear_catalog, label: shear_catalog,
+  shear_catalog: {format: desc:MetacalCatalog, id: shear_catalog, label: shear_catalog,
     type: File}
   sigma_e@TXRandomCat: {default: 0.27, id: sigma_e@TXRandomCat, label: sigma_e, type: float}
   snr_delta@TXDiagnosticMaps: {default: 1.0, id: snr_delta@TXDiagnosticMaps, label: snr_delta,
@@ -69,7 +69,7 @@ inputs:
     type: {items: float, type: array}
   zmax@TXRandomPhotozPDF: {id: zmax@TXRandomPhotozPDF, label: zmax, type: float}
 outputs:
-  twopoint_data: {format: HDFFile, id: twopoint_data, label: twopoint_data, outputSource: TXTwoPoint/twopoint_data,
+  twopoint_data: {format: desc:HDFFile, id: twopoint_data, label: twopoint_data, outputSource: TXTwoPoint/twopoint_data,
     type: File}
 steps:
   TXDiagnosticMaps:
@@ -118,3 +118,7 @@ steps:
       verbose: verbose@TXTwoPoint}
     out: [twopoint_data]
     run: TXTwoPoint.cwl
+
+
+$namespaces:
+    desc: https://www.lsst-desc.org/formats/
