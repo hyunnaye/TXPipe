@@ -2,6 +2,7 @@
 
 class: Workflow
 cwlVersion: v1.0
+doc: "LSST DESC 3x2pt analysis pipeline"
 inputs:
   Mstar@TXRandomCat: {default: 23.0, id: Mstar@TXRandomCat, label: Mstar, type: float}
   T_cut@TXSelector: {id: T_cut@TXSelector, label: T_cut, type: float}
