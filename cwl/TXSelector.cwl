@@ -10,7 +10,7 @@ doc: "\n    Selects and constructs metacal calibrations for tomographic bins of 
   \n    "
 hints:
   - class: DockerRequirement
-    dockerPull: eiffl/txpipe
+    dockerPull: quay.io/eiffl/txpipe
 
 id: TXSelector
 inputs:

@@ -8,7 +8,7 @@ class: CommandLineTool
 cwlVersion: v1.0
 hints:
   - class: DockerRequirement
-    dockerPull: eiffl/txpipe
+    dockerPull: quay.io/eiffl/txpipe
 
 id: TXTwoPoint
 inputs:

@@ -10,7 +10,7 @@ doc: "\n    Naively stack photo-z PDFs in bins according to previous selections.
   \n    "
 hints:
   - class: DockerRequirement
-    dockerPull: eiffl/txpipe
+    dockerPull: quay.io/eiffl/txpipe
 id: TXPhotozStack
 inputs:
   chunk_rows:

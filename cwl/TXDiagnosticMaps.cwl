@@ -14,7 +14,7 @@ doc: "\n    For now, this Pipeline Stage computes a depth map using the DR1 meth
   \ not on the DC2 timescale.\n\n    "
 hints:
   - class: DockerRequirement
-    dockerPull: eiffl/txpipe
+    dockerPull: quay.io/eiffl/txpipe
 
 id: TXDiagnosticMaps
 inputs:

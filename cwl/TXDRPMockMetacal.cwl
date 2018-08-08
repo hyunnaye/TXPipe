@@ -10,7 +10,7 @@ doc: "\n    Use real photometry from the DRP (output of DM stack) in merged form
   \    but fake metacal responses for the magnitudes.\n\n    TODO: Shapes!\n    "
 hints:
   - class: DockerRequirement
-    dockerPull: eiffl/txpipe
+    dockerPull: quay.io/eiffl/txpipe
 
 id: TXDRPMockMetacal
 inputs:

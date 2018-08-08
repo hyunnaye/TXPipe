@@ -12,7 +12,7 @@ doc: "\n    This is a placeholder for an actual photoz pipeline!\n\n    At the m
 id: TXRandomPhotozPDF
 hints:
   - class: DockerRequirement
-    dockerPull: eiffl/txpipe
+    dockerPull: quay.io/eiffl/txpipe
 
 inputs:
   bands:

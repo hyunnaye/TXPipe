@@ -13,7 +13,7 @@ doc: "\n    This stage simulates metacal data and metacalibrated\n    photometry
   \    for starting from a purer simulation.\n    "
 hints:
   - class: DockerRequirement
-    dockerPull: eiffl/txpipe
+    dockerPull: quay.io/eiffl/txpipe
 
 id: TXProtoDC2Mock
 inputs:
