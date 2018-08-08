@@ -136,13 +136,11 @@ s:contributor:
     s:email: mailto:emily.s.email
     s:name: Emily Longley
 
-s:contributor:
   - class: s:Person
     s:identifier: http://orcid.org/0000-0001-7956-0542
     s:email: mailto:francois.lanusse@gmail.com
     s:name: Francois Lanusse
 
-s:contributor:
   - class: s:Person
     s:identifier: http://orcid.org/0000-0001-1234-0000
     s:email: mailto:chichway.s.email
