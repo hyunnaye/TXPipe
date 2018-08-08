@@ -20,14 +20,14 @@ densit@TXRandomCaty: 10 # gals per sq arcmin
 binslop@TXTwoPoint: 0.1
 delta_gamma@TXTwoPoint: 0.02
 
-chunk_rows@TXDiagnosticMaps: 10000  # Number of rows to process at once
-sparse@TXDiagnosticMaps: True  # Generate sparse maps - faster if using small areas
+chunk_rows@TXDiagnosticMaps: 10000
+sparse@TXDiagnosticMaps: True
 snr_threshold@TXDiagnosticMaps: 10.0
 snr_delta@TXDiagnosticMaps: 1.0
-# pixelization: healpix
-# nside: 2048       #
+
+
 pixelization@TXDiagnosticMaps: tangent
-#
+
 ra_min@TXDiagnosticMaps: -3.0
 ra_max@TXDiagnosticMaps: 3.0
 dec_min@TXDiagnosticMaps: -3.0
@@ -38,16 +38,16 @@ pixel_size@TXDiagnosticMaps: 0.2
 # Default configuraton
 config:
   class: File
-  path: config.yml
+  path: "config.yml"
   format: "desc:YamlFile"
 
 # Input files
 shear_catalog:
   class: File
-  path: https://portal.nersc.gov/project/lsst/WeakLensing/mock_shear_catalog.fits
+  path: "https://portal.nersc.gov/project/lsst/WeakLensing/mock_shear_catalog.fits"
   format: "desc:MetacalCatalog"
 
 photometry_catalog:
   class: File
-  path: https://portal.nersc.gov/project/lsst/WeakLensing/mock_photometry_catalog.hdf
+  path: "https://portal.nersc.gov/project/lsst/WeakLensing/mock_photometry_catalog.hdf"
   format: "desc:HDFFile"
