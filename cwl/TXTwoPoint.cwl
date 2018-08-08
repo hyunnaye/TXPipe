@@ -21,8 +21,7 @@ inputs:
   calcs:
     default: [0, 1, 2]
     doc: Some documentation about this parameter
-    inputBinding: {itemSeparator: ',', loadContents: false, prefix: --calcs=, separate: false,
-      shellQuote: true}
+    inputBinding: {itemSeparator: ',', loadContents: false, prefix: --calcs=, separate: false, shellQuote: true}
     label: calcs
     type: {items: int, type: array}
   config:
