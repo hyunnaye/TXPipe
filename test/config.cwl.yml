@@ -38,7 +38,7 @@ pixel_size@TXDiagnosticMaps: 0.2
 # Default configuraton
 config:
   class: File
-  path: "config.yml"
+  path: "https://raw.githubusercontent.com/EiffL/TXPipe/master/test/config.yml"
   format: "desc:YamlFile"
 
 # Input files
