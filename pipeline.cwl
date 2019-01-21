@@ -90,34 +90,34 @@ steps:
       ra_min: ra_min@TXDiagnosticMaps, snr_delta: snr_delta@TXDiagnosticMaps, snr_threshold: snr_threshold@TXDiagnosticMaps,
       sparse: sparse@TXDiagnosticMaps}
     out: [diagnostic_maps]
-    run: cwl/TXDiagnosticMaps.cwl
+    run: TXDiagnosticMaps.cwl
   TXPhotozStack:
     id: TXPhotozStack
     in: {chunk_rows: chunk_rows@TXPhotozStack, config: config, photoz_pdfs: TXRandomPhotozPDF/photoz_pdfs,
       tomography_catalog: TXSelector/tomography_catalog}
     out: [photoz_stack]
-    run: cwl/TXPhotozStack.cwl
+    run: TXPhotozStack.cwl
   TXRandomCat:
     id: TXRandomCat
     in: {Mstar: Mstar@TXRandomCat, alpha: alpha@TXRandomCat, config: config, density: density@TXRandomCat,
       diagnostic_maps: TXDiagnosticMaps/diagnostic_maps, sigma_e: sigma_e@TXRandomCat,
       tomography_catalog: TXSelector/tomography_catalog}
     out: [random_cats]
-    run: cwl/TXRandomCat.cwl
+    run: TXRandomCat.cwl
   TXRandomPhotozPDF:
     id: TXRandomPhotozPDF
     in: {bands: bands@TXRandomPhotozPDF, chunk_rows: chunk_rows@TXRandomPhotozPDF,
       config: config, nz: nz@TXRandomPhotozPDF, photometry_catalog: photometry_catalog,
       zmax: zmax@TXRandomPhotozPDF}
     out: [photoz_pdfs]
-    run: cwl/TXRandomPhotozPDF.cwl
+    run: TXRandomPhotozPDF.cwl
   TXSelector:
     id: TXSelector
     in: {T_cut: T_cut@TXSelector, chunk_rows: chunk_rows@TXSelector, config: config,
       delta_gamma: delta_gamma@TXSelector, max_rows: max_rows@TXSelector, photoz_pdfs: TXRandomPhotozPDF/photoz_pdfs,
       s2n_cut: s2n_cut@TXSelector, shear_catalog: shear_catalog, zbin_edges: zbin_edges@TXSelector}
     out: [tomography_catalog]
-    run: cwl/TXSelector.cwl
+    run: TXSelector.cwl
   TXTwoPoint:
     id: TXTwoPoint
     in: {bin_slop: bin_slop@TXTwoPoint, calcs: calcs@TXTwoPoint, config: config, cores_per_task: cores_per_task@TXTwoPoint,
@@ -126,7 +126,7 @@ steps:
       shear_catalog: shear_catalog, tomography_catalog: TXSelector/tomography_catalog,
       verbose: verbose@TXTwoPoint}
     out: [twopoint_data]
-    run: cwl/TXTwoPoint.cwl
+    run: TXTwoPoint.cwl
 
 
 s:author:
