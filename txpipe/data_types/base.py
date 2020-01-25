@@ -22,13 +22,15 @@ class DataFile:
     to indicate what kind of file is expected.  The "suffix" attribute,
     which must be defined on subclasses, indicates the file suffix.
 
-    The open method, which can optionally be overridden, is used by the 
+    The open method, which can optionally be overridden, is used by the
     machinery of the PipelineStage class to open an input our output
     named by a tag.
 
     """
     supports_parallel_write = False
     suffix = None
+    format = 'http://edamontology.org/format_1915'
+    
     def __init__(self, path, mode, extra_provenance=None, validate=True, **kwargs):
         self.path = path
         self.mode = mode
@@ -47,14 +49,14 @@ class DataFile:
     def generate_provenance(extra_provenance):
         """
         Generate provenance information - a dictionary
-        of useful information about the origina 
+        of useful information about the origina
         """
         UUID = uuid.uuid4().hex
         creation = datetime.datetime.now().isoformat()
         domain = socket.getfqdn()
         username = getpass.getuser()
 
-        # Add other provenance and related 
+        # Add other provenance and related
         provenance = {
             'uuid': UUID,
             'creation': creation,
@@ -137,6 +139,7 @@ class HDFFile(DataFile):
 
     """
     suffix = 'hdf5'
+    format = 'http://edamontology.org/format_3590'
     required_datasets = []
 
     @classmethod
@@ -158,7 +161,7 @@ class HDFFile(DataFile):
             raise ValueError("Cannot write provenance to a file opened in read-only mode")
 
         # This method *must* be called by all the processes in a parallel
-        # run.  
+        # run.
         self._provenance_group = self.file.create_group('provenance')
 
         # Call the sub-method to do each item
@@ -172,7 +175,7 @@ class HDFFile(DataFile):
         except KeyError:
             group = None
             attrs = {}
-        
+
         provenance = {
             'uuid':     attrs.get('uuid', "UNKNOWN"),
             'creation': attrs.get('creation', "UNKNOWN"),
@@ -203,6 +206,7 @@ class FitsFile(DataFile):
     Using these files requires the fitsio package.
     """
     suffix = 'fits'
+    format = 'http://edamontology.org/format_2333'
     required_columns = []
 
     @classmethod
@@ -274,12 +278,14 @@ class TextFile(DataFile):
     A data file in plain text format.
     """
     suffix = 'txt'
+    format = 'http://edamontology.org/format_2330'
 
 class YamlFile(DataFile):
     """
     A data file in yaml format.
     """
     suffix = 'yml'
+    format = 'http://edamontology.org/format_3750'
 
 class Directory(DataFile):
     suffix = ''
@@ -303,7 +309,7 @@ class Directory(DataFile):
         called 'provenance'
         """
         # This method *must* be called by all the processes in a parallel
-        # run.  
+        # run.
         if self.mode == 'r':
             raise ValueError("Cannot write provenance to a directory opened in read-only mode")
 
@@ -324,7 +330,7 @@ class Directory(DataFile):
             attrs = {}
 
         self._provenance_file = f
-        
+
         provenance = {
             'uuid':     attrs.get('uuid', "UNKNOWN"),
             'creation': attrs.get('creation', "UNKNOWN"),
@@ -338,6 +344,7 @@ class Directory(DataFile):
 
 class PNGFile(DataFile):
     suffix = 'png'
+    fomat = 'http://edamontology.org/format_3603'
 
     @classmethod
     def open(self, path, mode, **kwargs):
@@ -346,7 +353,6 @@ class PNGFile(DataFile):
         if mode != "w":
             raise ValueError("Reading existing PNG files is not supported")
         return plt.figure(**kwargs)
-
 
     def close(self):
         import matplotlib.pyplot as plt
