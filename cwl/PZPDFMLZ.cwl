@@ -4,19 +4,12 @@ arguments:
 - position: -1
   valueFrom: -mtxpipe
 - position: 0
-  valueFrom: TXRandomPhotozPDF
+  valueFrom: PZPDFMLZ
 baseCommand: python3
 class: CommandLineTool
 cwlVersion: v1.0
-doc: "\n    This is a placeholder for an actual photoz pipeline!\n\n    At the moment\
-  \ it just randomly generates a log-normal PDF for each object.\n\n    The pipeline\
-  \ loops through input photometry data,\n    \"calculating\" (at random!) a PDF and\
-  \ a point-estimate for each row.\n    It must generate the point estimates for the\
-  \ five different \n    metacal variants (which each have different shears applied).\
-  \ \n\n    It can do this in parallel if needed.\n\n    We might want to move some\
-  \ of the functionality here (e.g. the I/O)\n    into a general parent class.\n\n\
-  \    "
-id: TXRandomPhotozPDF
+doc: "\n\n\n    "
+id: PZPDFMLZ
 inputs:
 - doc: Some documentation about this parameter
   id: zmax
@@ -40,7 +33,7 @@ inputs:
     separate: false
   label: chunk_rows
   type: int
-- default: ugriz
+- default: ugrizy
   doc: Some documentation about this parameter
   id: bands
   inputBinding:
@@ -55,6 +48,13 @@ inputs:
     prefix: --photometry_catalog
   label: photometry_catalog
   type: File
+- doc: Some documentation about the input
+  format: http://edamontology.org/format_1915
+  id: photoz_trained_model
+  inputBinding:
+    prefix: --photoz_trained_model
+  label: photoz_trained_model
+  type: File
 - doc: Configuration file
   format: http://edamontology.org/format_3750
   id: config
@@ -62,7 +62,7 @@ inputs:
     prefix: --config
   label: config
   type: File
-label: TXRandomPhotozPDF
+label: PZPDFMLZ
 outputs:
 - doc: Some results produced by the pipeline element
   format: http://edamontology.org/format_3590

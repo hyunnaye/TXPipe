@@ -4,64 +4,50 @@ arguments:
 - position: -1
   valueFrom: -mtxpipe
 - position: 0
-  valueFrom: TXRandomCat
+  valueFrom: TXBrighterFatterPlot
 baseCommand: python3
 class: CommandLineTool
 cwlVersion: v1.0
-id: TXRandomCat
+id: TXBrighterFatterPlot
 inputs:
-- default: 100.0
+- default: r
   doc: Some documentation about this parameter
-  id: density
+  id: band
   inputBinding:
-    prefix: --density=
+    prefix: --band=
     separate: false
-  label: density
+  label: band
+  type: string
+- default: 20
+  doc: Some documentation about this parameter
+  id: nbin
+  inputBinding:
+    prefix: --nbin=
+    separate: false
+  label: nbin
+  type: int
+- default: 18.5
+  doc: Some documentation about this parameter
+  id: mmin
+  inputBinding:
+    prefix: --mmin=
+    separate: false
+  label: mmin
   type: float
-- default: 23.0
+- default: 23.5
   doc: Some documentation about this parameter
-  id: Mstar
+  id: mmax
   inputBinding:
-    prefix: --Mstar=
+    prefix: --mmax=
     separate: false
-  label: Mstar
-  type: float
-- default: -1.25
-  doc: Some documentation about this parameter
-  id: alpha
-  inputBinding:
-    prefix: --alpha=
-    separate: false
-  label: alpha
-  type: float
-- default: 0.27
-  doc: Some documentation about this parameter
-  id: sigma_e
-  inputBinding:
-    prefix: --sigma_e=
-    separate: false
-  label: sigma_e
+  label: mmax
   type: float
 - doc: Some documentation about the input
   format: http://edamontology.org/format_3590
-  id: diagnostic_maps
+  id: star_catalog
   inputBinding:
-    prefix: --diagnostic_maps
-  label: diagnostic_maps
-  type: File
-- doc: Some documentation about the input
-  format: http://edamontology.org/format_3590
-  id: tomography_catalog
-  inputBinding:
-    prefix: --tomography_catalog
-  label: tomography_catalog
-  type: File
-- doc: Some documentation about the input
-  format: http://edamontology.org/format_3590
-  id: photoz_stack
-  inputBinding:
-    prefix: --photoz_stack
-  label: photoz_stack
+    prefix: --star_catalog
+  label: star_catalog
   type: File
 - doc: Configuration file
   format: http://edamontology.org/format_3750
@@ -70,12 +56,19 @@ inputs:
     prefix: --config
   label: config
   type: File
-label: TXRandomCat
+label: TXBrighterFatterPlot
 outputs:
 - doc: Some results produced by the pipeline element
-  format: http://edamontology.org/format_3590
-  id: random_cats
-  label: random_cats
+  format: http://edamontology.org/format_1915
+  id: brighter_fatter_plot
+  label: brighter_fatter_plot
   outputBinding:
-    glob: random_cats.hdf5
+    glob: brighter_fatter_plot.png
+  type: File
+- doc: Some results produced by the pipeline element
+  format: http://edamontology.org/format_3590
+  id: brighter_fatter_data
+  label: brighter_fatter_data
+  outputBinding:
+    glob: brighter_fatter_data.hdf5
   type: File

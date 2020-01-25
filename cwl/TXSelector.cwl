@@ -1,78 +1,182 @@
 #!/usr/bin/env cwl-runner
 
 arguments:
-- {loadContents: false, position: -1, separate: true, shellQuote: true, valueFrom: -mtxpipe}
-- {loadContents: false, position: 0, separate: true, shellQuote: true, valueFrom: TXSelector}
+- position: -1
+  valueFrom: -mtxpipe
+- position: 0
+  valueFrom: TXSelector
 baseCommand: python3
 class: CommandLineTool
 cwlVersion: v1.0
-doc: "\n    Selects and constructs metacal calibrations for tomographic bins of objects\n\
-  \n    "
-hints:
-  - class: DockerRequirement
-    dockerPull: quay.io/eiffl/txpipe
-
+doc: "\n    This pipeline stage selects objects to be used\n    as the source sample\
+  \ for the shear-shear and\n    shear-position calibrations.  It applies some\n \
+  \   general cuts based on the flags that metacal\n    gives for the objects, and\
+  \ size and S/N cuts\n    based on the configuration file.\n\n    It also splits\
+  \ those objects into tomographic\n    bins according to the choice the user makes\n\
+  \    in the input file, from the information in the\n    photo-z PDF file.\n\n \
+  \   Once these selections are made it constructs\n    the quantities needed to calibrate\
+  \ each bin -\n    this consists of two shear response quantities.\n    "
 id: TXSelector
 inputs:
-  T_cut:
-    doc: Some documentation about this parameter
-    inputBinding: {loadContents: false, prefix: --T_cut=, separate: false, shellQuote: true}
-    label: T_cut
-    type: float
-  chunk_rows:
-    default: 10000
-    doc: Some documentation about this parameter
-    inputBinding: {loadContents: false, prefix: --chunk_rows=, separate: false, shellQuote: true}
-    label: chunk_rows
-    type: int
-  config:
-    doc: Configuration file
-    format: "desc:YamlFile"
-    inputBinding: {loadContents: false, prefix: --config, separate: true, shellQuote: true}
-    label: config
-    type: File
-  delta_gamma:
-    doc: Some documentation about this parameter
-    inputBinding: {loadContents: false, prefix: --delta_gamma=, separate: false, shellQuote: true}
-    label: delta_gamma
-    type: float
-  max_rows:
-    default: 0
-    doc: Some documentation about this parameter
-    inputBinding: {loadContents: false, prefix: --max_rows=, separate: false, shellQuote: true}
-    label: max_rows
-    type: int
-  photoz_pdfs:
-    doc: Some documentation about the input
-    format: "desc:PhotozPDFFile"
-    inputBinding: {loadContents: false, prefix: --photoz_pdfs, separate: true, shellQuote: true}
-    label: photoz_pdfs
-    type: File
-  s2n_cut:
-    doc: Some documentation about this parameter
-    inputBinding: {loadContents: false, prefix: --s2n_cut=, separate: false, shellQuote: true}
-    label: s2n_cut
-    type: float
-  shear_catalog:
-    doc: Some documentation about the input
-    format: "desc:MetacalCatalog"
-    inputBinding: {loadContents: false, prefix: --shear_catalog, separate: true, shellQuote: true}
-    label: shear_catalog
-    type: File
-  zbin_edges:
-    doc: Some documentation about this parameter
-    inputBinding: {itemSeparator: ',', loadContents: false, prefix: --zbin_edges=,
-      separate: false, shellQuote: true}
-    label: zbin_edges
-    type: {items: float, type: array}
+- default: false
+  doc: Some documentation about this parameter
+  id: input_pz
+  inputBinding:
+    prefix: --input_pz
+  label: input_pz
+  type: boolean
+- default: riz
+  doc: Some documentation about this parameter
+  id: bands
+  inputBinding:
+    prefix: --bands=
+    separate: false
+  label: bands
+  type: string
+- default: false
+  doc: Some documentation about this parameter
+  id: verbose
+  inputBinding:
+    prefix: --verbose
+  label: verbose
+  type: boolean
+- doc: Some documentation about this parameter
+  id: T_cut
+  inputBinding:
+    prefix: --T_cut=
+    separate: false
+  label: T_cut
+  type: float
+- doc: Some documentation about this parameter
+  id: s2n_cut
+  inputBinding:
+    prefix: --s2n_cut=
+    separate: false
+  label: s2n_cut
+  type: float
+- doc: Some documentation about this parameter
+  id: delta_gamma
+  inputBinding:
+    prefix: --delta_gamma=
+    separate: false
+  label: delta_gamma
+  type: float
+- default: 10000
+  doc: Some documentation about this parameter
+  id: chunk_rows
+  inputBinding:
+    prefix: --chunk_rows=
+    separate: false
+  label: chunk_rows
+  type: int
+- doc: Some documentation about this parameter
+  id: zbin_edges
+  inputBinding:
+    itemSeparator: ','
+    prefix: --zbin_edges=
+    separate: false
+  label: zbin_edges
+  type:
+    items: float
+    type: array
+- default: 0.2
+  doc: Some documentation about this parameter
+  id: cperp_cut
+  inputBinding:
+    prefix: --cperp_cut=
+    separate: false
+  label: cperp_cut
+  type: float
+- default: 13.5
+  doc: Some documentation about this parameter
+  id: r_cpar_cut
+  inputBinding:
+    prefix: --r_cpar_cut=
+    separate: false
+  label: r_cpar_cut
+  type: float
+- default: 16.0
+  doc: Some documentation about this parameter
+  id: r_lo_cut
+  inputBinding:
+    prefix: --r_lo_cut=
+    separate: false
+  label: r_lo_cut
+  type: float
+- default: 19.6
+  doc: Some documentation about this parameter
+  id: r_hi_cut
+  inputBinding:
+    prefix: --r_hi_cut=
+    separate: false
+  label: r_hi_cut
+  type: float
+- default: 17.5
+  doc: Some documentation about this parameter
+  id: i_lo_cut
+  inputBinding:
+    prefix: --i_lo_cut=
+    separate: false
+  label: i_lo_cut
+  type: float
+- default: 19.9
+  doc: Some documentation about this parameter
+  id: i_hi_cut
+  inputBinding:
+    prefix: --i_hi_cut=
+    separate: false
+  label: i_hi_cut
+  type: float
+- default: 2.0
+  doc: Some documentation about this parameter
+  id: r_i_cut
+  inputBinding:
+    prefix: --r_i_cut=
+    separate: false
+  label: r_i_cut
+  type: float
+- default: 42
+  doc: Some documentation about this parameter
+  id: random_seed
+  inputBinding:
+    prefix: --random_seed=
+    separate: false
+  label: random_seed
+  type: int
+- doc: Some documentation about the input
+  format: http://edamontology.org/format_3590
+  id: shear_catalog
+  inputBinding:
+    prefix: --shear_catalog
+  label: shear_catalog
+  type: File
+- doc: Some documentation about the input
+  format: http://edamontology.org/format_2330
+  id: calibration_table
+  inputBinding:
+    prefix: --calibration_table
+  label: calibration_table
+  type: File
+- doc: Some documentation about the input
+  format: http://edamontology.org/format_3590
+  id: photometry_catalog
+  inputBinding:
+    prefix: --photometry_catalog
+  label: photometry_catalog
+  type: File
+- doc: Configuration file
+  format: http://edamontology.org/format_3750
+  id: config
+  inputBinding:
+    prefix: --config
+  label: config
+  type: File
 label: TXSelector
 outputs:
-  tomography_catalog:
-    doc: Some results produced by the pipeline element
-    format: "desc:TomographyCatalog"
-    label: tomography_catalog
-    outputBinding: {glob: tomography_catalog.hdf}
-    type: File
-
-$namespaces:
-    desc: https://www.lsst-desc.org/formats/
+- doc: Some results produced by the pipeline element
+  format: http://edamontology.org/format_3590
+  id: tomography_catalog
+  label: tomography_catalog
+  outputBinding:
+    glob: tomography_catalog.hdf5
+  type: File

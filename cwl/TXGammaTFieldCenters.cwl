@@ -4,11 +4,13 @@ arguments:
 - position: -1
   valueFrom: -mtxpipe
 - position: 0
-  valueFrom: TXTwoPoint
+  valueFrom: TXGammaTFieldCenters
 baseCommand: python3
 class: CommandLineTool
 cwlVersion: v1.0
-id: TXTwoPoint
+doc: "\n    This subclass of the standard TXTwoPoint uses the centers\n    of exposure\
+  \ fields as \"lenses\", as a systematics test.\n    "
+id: TXGammaTFieldCenters
 inputs:
 - default:
   - 0
@@ -87,30 +89,6 @@ inputs:
     separate: false
   label: verbose
   type: int
-- default:
-  - -1
-  doc: Some documentation about this parameter
-  id: source_bins
-  inputBinding:
-    itemSeparator: ','
-    prefix: --source_bins=
-    separate: false
-  label: source_bins
-  type:
-    items: int
-    type: array
-- default:
-  - -1
-  doc: Some documentation about this parameter
-  id: lens_bins
-  inputBinding:
-    itemSeparator: ','
-    prefix: --lens_bins=
-    separate: false
-  label: lens_bins
-  type:
-    items: int
-    type: array
 - default: 1.0
   doc: Some documentation about this parameter
   id: reduce_randoms_size
@@ -119,27 +97,6 @@ inputs:
     separate: false
   label: reduce_randoms_size
   type: float
-- default: true
-  doc: Some documentation about this parameter
-  id: do_shear_shear
-  inputBinding:
-    prefix: --do_shear_shear
-  label: do_shear_shear
-  type: boolean
-- default: true
-  doc: Some documentation about this parameter
-  id: do_shear_pos
-  inputBinding:
-    prefix: --do_shear_pos
-  label: do_shear_pos
-  type: boolean
-- default: true
-  doc: Some documentation about this parameter
-  id: do_pos_pos
-  inputBinding:
-    prefix: --do_pos_pos
-  label: do_pos_pos
-  type: boolean
 - doc: Some documentation about the input
   format: http://edamontology.org/format_3590
   id: shear_catalog
@@ -168,6 +125,13 @@ inputs:
     prefix: --random_cats
   label: random_cats
   type: File
+- doc: Some documentation about the input
+  format: http://edamontology.org/format_3590
+  id: exposures
+  inputBinding:
+    prefix: --exposures
+  label: exposures
+  type: File
 - doc: Configuration file
   format: http://edamontology.org/format_3750
   id: config
@@ -175,12 +139,19 @@ inputs:
     prefix: --config
   label: config
   type: File
-label: TXTwoPoint
+label: TXGammaTFieldCenters
 outputs:
 - doc: Some results produced by the pipeline element
   format: http://edamontology.org/format_1915
-  id: twopoint_data
-  label: twopoint_data
+  id: gammat_field_center
+  label: gammat_field_center
   outputBinding:
-    glob: twopoint_data.sacc
+    glob: gammat_field_center.sacc
+  type: File
+- doc: Some results produced by the pipeline element
+  format: http://edamontology.org/format_1915
+  id: gammat_field_center_plot
+  label: gammat_field_center_plot
+  outputBinding:
+    glob: gammat_field_center_plot.png
   type: File

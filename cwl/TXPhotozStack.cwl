@@ -1,51 +1,52 @@
 #!/usr/bin/env cwl-runner
 
 arguments:
-- {loadContents: false, position: -1, separate: true, shellQuote: true, valueFrom: -mtxpipe}
-- {loadContents: false, position: 0, separate: true, shellQuote: true, valueFrom: TXPhotozStack}
+- position: -1
+  valueFrom: -mtxpipe
+- position: 0
+  valueFrom: TXPhotozStack
 baseCommand: python3
 class: CommandLineTool
 cwlVersion: v1.0
 doc: "\n    Naively stack photo-z PDFs in bins according to previous selections.\n\
   \n    "
-hints:
-  - class: DockerRequirement
-    dockerPull: quay.io/eiffl/txpipe
 id: TXPhotozStack
 inputs:
-  chunk_rows:
-    default: 5000
-    doc: Some documentation about this parameter
-    inputBinding: {loadContents: false, prefix: --chunk_rows=, separate: false, shellQuote: true}
-    label: chunk_rows
-    type: int
-  config:
-    doc: Configuration file
-    format: "desc:YamlFile"
-    inputBinding: {loadContents: false, prefix: --config, separate: true, shellQuote: true}
-    label: config
-    type: File
-  photoz_pdfs:
-    doc: Some documentation about the input
-    format: "desc:PhotozPDFFile"
-    inputBinding: {loadContents: false, prefix: --photoz_pdfs, separate: true, shellQuote: true}
-    label: photoz_pdfs
-    type: File
-  tomography_catalog:
-    doc: Some documentation about the input
-    format: "desc:TomographyCatalog"
-    inputBinding: {loadContents: false, prefix: --tomography_catalog, separate: true,
-      shellQuote: true}
-    label: tomography_catalog
-    type: File
+- default: 5000
+  doc: Some documentation about this parameter
+  id: chunk_rows
+  inputBinding:
+    prefix: --chunk_rows=
+    separate: false
+  label: chunk_rows
+  type: int
+- doc: Some documentation about the input
+  format: http://edamontology.org/format_3590
+  id: photoz_pdfs
+  inputBinding:
+    prefix: --photoz_pdfs
+  label: photoz_pdfs
+  type: File
+- doc: Some documentation about the input
+  format: http://edamontology.org/format_3590
+  id: tomography_catalog
+  inputBinding:
+    prefix: --tomography_catalog
+  label: tomography_catalog
+  type: File
+- doc: Configuration file
+  format: http://edamontology.org/format_3750
+  id: config
+  inputBinding:
+    prefix: --config
+  label: config
+  type: File
 label: TXPhotozStack
 outputs:
-  photoz_stack:
-    doc: Some results produced by the pipeline element
-    format: "desc:HDFFile"
-    label: photoz_stack
-    outputBinding: {glob: photoz_stack.hdf}
-    type: File
-
-$namespaces:
-    desc: https://www.lsst-desc.org/formats/
+- doc: Some results produced by the pipeline element
+  format: http://edamontology.org/format_3590
+  id: photoz_stack
+  label: photoz_stack
+  outputBinding:
+    glob: photoz_stack.hdf5
+  type: File

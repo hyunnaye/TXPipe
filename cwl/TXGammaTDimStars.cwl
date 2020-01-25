@@ -4,11 +4,13 @@ arguments:
 - position: -1
   valueFrom: -mtxpipe
 - position: 0
-  valueFrom: TXTwoPoint
+  valueFrom: TXGammaTDimStars
 baseCommand: python3
 class: CommandLineTool
 cwlVersion: v1.0
-id: TXTwoPoint
+doc: "\n    This subclass of the standard TXTwoPoint uses the centers\n    of stars\
+  \ as \"lenses\", as a systematics test.\n    "
+id: TXGammaTDimStars
 inputs:
 - default:
   - 0
@@ -32,7 +34,7 @@ inputs:
     separate: false
   label: min_sep
   type: float
-- default: 250
+- default: 100
   doc: Some documentation about this parameter
   id: max_sep
   inputBinding:
@@ -87,30 +89,6 @@ inputs:
     separate: false
   label: verbose
   type: int
-- default:
-  - -1
-  doc: Some documentation about this parameter
-  id: source_bins
-  inputBinding:
-    itemSeparator: ','
-    prefix: --source_bins=
-    separate: false
-  label: source_bins
-  type:
-    items: int
-    type: array
-- default:
-  - -1
-  doc: Some documentation about this parameter
-  id: lens_bins
-  inputBinding:
-    itemSeparator: ','
-    prefix: --lens_bins=
-    separate: false
-  label: lens_bins
-  type:
-    items: int
-    type: array
 - default: 1.0
   doc: Some documentation about this parameter
   id: reduce_randoms_size
@@ -119,27 +97,6 @@ inputs:
     separate: false
   label: reduce_randoms_size
   type: float
-- default: true
-  doc: Some documentation about this parameter
-  id: do_shear_shear
-  inputBinding:
-    prefix: --do_shear_shear
-  label: do_shear_shear
-  type: boolean
-- default: true
-  doc: Some documentation about this parameter
-  id: do_shear_pos
-  inputBinding:
-    prefix: --do_shear_pos
-  label: do_shear_pos
-  type: boolean
-- default: true
-  doc: Some documentation about this parameter
-  id: do_pos_pos
-  inputBinding:
-    prefix: --do_pos_pos
-  label: do_pos_pos
-  type: boolean
 - doc: Some documentation about the input
   format: http://edamontology.org/format_3590
   id: shear_catalog
@@ -168,6 +125,13 @@ inputs:
     prefix: --random_cats
   label: random_cats
   type: File
+- doc: Some documentation about the input
+  format: http://edamontology.org/format_3590
+  id: star_catalog
+  inputBinding:
+    prefix: --star_catalog
+  label: star_catalog
+  type: File
 - doc: Configuration file
   format: http://edamontology.org/format_3750
   id: config
@@ -175,12 +139,19 @@ inputs:
     prefix: --config
   label: config
   type: File
-label: TXTwoPoint
+label: TXGammaTDimStars
 outputs:
 - doc: Some results produced by the pipeline element
   format: http://edamontology.org/format_1915
-  id: twopoint_data
-  label: twopoint_data
+  id: gammat_dim_stars
+  label: gammat_dim_stars
   outputBinding:
-    glob: twopoint_data.sacc
+    glob: gammat_dim_stars.sacc
+  type: File
+- doc: Some results produced by the pipeline element
+  format: http://edamontology.org/format_1915
+  id: gammat_dim_stars_plot
+  label: gammat_dim_stars_plot
+  outputBinding:
+    glob: gammat_dim_stars_plot.png
   type: File

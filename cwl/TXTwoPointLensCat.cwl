@@ -4,11 +4,13 @@ arguments:
 - position: -1
   valueFrom: -mtxpipe
 - position: 0
-  valueFrom: TXTwoPoint
+  valueFrom: TXTwoPointLensCat
 baseCommand: python3
 class: CommandLineTool
 cwlVersion: v1.0
-id: TXTwoPoint
+doc: "\n    This subclass of the standard TXTwoPoint takes its\n    lens sample from\
+  \ an external source instead of using\n    the photometric sample.\n    "
+id: TXTwoPointLensCat
 inputs:
 - default:
   - 0
@@ -168,6 +170,13 @@ inputs:
     prefix: --random_cats
   label: random_cats
   type: File
+- doc: Some documentation about the input
+  format: http://edamontology.org/format_3590
+  id: lens_catalog
+  inputBinding:
+    prefix: --lens_catalog
+  label: lens_catalog
+  type: File
 - doc: Configuration file
   format: http://edamontology.org/format_3750
   id: config
@@ -175,7 +184,7 @@ inputs:
     prefix: --config
   label: config
   type: File
-label: TXTwoPoint
+label: TXTwoPointLensCat
 outputs:
 - doc: Some results produced by the pipeline element
   format: http://edamontology.org/format_1915
