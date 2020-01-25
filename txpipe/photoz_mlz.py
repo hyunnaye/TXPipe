@@ -1,57 +1,36 @@
 from .base_stage import PipelineStage
-from .data_types import PhotozPDFFile, MetacalCatalog, YamlFile, HDFFile
+from .data_types import PhotozPDFFile, MetacalCatalog, YamlFile, HDFFile, DataFile
+import sys
 import numpy as np
 
-class TXRandomPhotozPDF(PipelineStage):
+class PZPDFMLZ(PipelineStage):
     """
-    This is a placeholder for an actual photoz pipeline!
 
-    At the moment it just randomly generates a log-normal PDF for each object.
-
-    The pipeline loops through input photometry data,
-    "calculating" (at random!) a PDF and a point-estimate for each row.
-    It must generate the point estimates for the five different 
-    metacal variants (which each have different shears applied). 
-
-    It can do this in parallel if needed.
-
-    We might want to move some of the functionality here (e.g. the I/O)
-    into a general parent class.
 
     """
-    name='TXRandomPhotozPDF'
+    name='PZPDFMLZ'
 
     inputs = [
         ('photometry_catalog', HDFFile),
+        ('photoz_trained_model', DataFile),
     ]
     outputs = [
         ('photoz_pdfs', PhotozPDFFile),
     ]
 
-    # Configuration options.
-    # If the value here is a type, like "float" or "int" then that
-    # means there is no default value for that parameter and the
-    # user must include the parameter in the config file, of that type.
-    # Otherwise the entry lists the default value for the parameter.
     config_options = {
         'zmax': float,
         'nz': int,
         'chunk_rows': 10000,
-        'bands':'ugriz'
+        'bands':'ugrizy'
     }
 
 
     def run(self):
         """
-        Run the analysis for this stage.
-
-         - prepares the output HDF5 file
-         - loads in chunks of input data, one at a time
-         - computes mock photo-z PDFs for each chunk
-         - writes each chunk to output
-         - closes the output file
-
         """
+        import mlz_desc
+        import mlz_desc.ml_codes
         import scipy.stats
 
         zmax = self.config['zmax']
@@ -61,17 +40,18 @@ class TXRandomPhotozPDF(PipelineStage):
         # Open the input catalog and check how many objects
         # we will be running on.
         cat = self.open_input("photometry_catalog")
-        nobj = cat['photometry/id'].size
+        nobj = cat['photometry/ra'].size
         cat.close()
+
+        features, trees = self.load_training()
         
         # Prepare the output HDF5 file
         output_file = self.prepare_output(nobj, z)
 
-        suffices = ["", "_1p", "_1m", "_2p", "_2m"]
         bands = self.config['bands']
         # The columns we need to calculate the photo-z.
         # Note that we need all the metacalibrated variants too.
-        cols = [f'mag_{band}_lsst{suffix}' for band in bands for suffix in suffices]
+        cols = [f'{band}_mag' for band in bands]
 
         # Loop through chunks of the data.
         # Parallelism is handled in the iterate_input function - 
@@ -81,9 +61,9 @@ class TXRandomPhotozPDF(PipelineStage):
         chunk_rows = self.config['chunk_rows']
         for start, end, data in self.iterate_hdf('photometry_catalog', "photometry", cols, chunk_rows):
             print(f"Process {self.rank} running photo-z for rows {start}-{end}")
-
+            sys.stdout.flush()
             # Compute some mock photo-z PDFs and point estimates
-            pdfs, point_estimates = self.calculate_photozs(data, z)
+            pdfs, point_estimates = self.calculate_photozs(data, z, features, trees)
             # Save this chunk of data to the output file
             self.write_output(output_file, start, end, pdfs, point_estimates)
 
@@ -94,7 +74,16 @@ class TXRandomPhotozPDF(PipelineStage):
         # Finish
         output_file.close()
 
-    def calculate_photozs(self, data, z):
+    def load_training(self):
+        import mlz_desc
+        import mlz_desc.ml_codes
+        import sys
+        sys.modules['mlz'] = sys.modules['mlz_desc']
+        filename = self.get_input('photoz_trained_model')
+        features, trees = np.load(filename, allow_pickle=True)
+        return features, trees
+
+    def calculate_photozs(self, data, z, features, trees):
         """
         Generate random photo-zs.
 
@@ -128,33 +117,69 @@ class TXRandomPhotozPDF(PipelineStage):
             Point-estimated photo-zs for each of the 5 metacalibrated variants
 
         """
+        import numpy as np
         import scipy.stats
 
         # Number of z points we will be using
-        nz = self.config['nz']
+        nbin = len(z) - 1
+        nrow = len(data['i_mag'])
 
-        # We just want any random element to use as the size.
-        # It's painful how ugly this is in python 3!
-        nobj = len(next(iter(data.values())))
 
-        # Generate some random median redshifts between 0.2 and 1.0
-        medians = np.random.uniform(0.2, 1.0, size=nobj)
-        sigmas = 0.05 * (1+medians)
+        # These are the old names for the features
+        if features == [
+            'mag_u_lsst',
+            'mag_g_lsst',
+            'mag_r_lsst',
+            'mag_i_lsst',
+            'mag_z_lsst',
+            'mag_y_lsst', 
+            'mag_u_lsst-mag_g_lsst',
+            'mag_g_lsst-mag_r_lsst',
+            'mag_r_lsst-mag_i_lsst',
+            'mag_i_lsst-mag_z_lsst',
+            'mag_z_lsst-mag_y_lsst']:
+            x =  [data[f'{b}_mag'] for b in 'ugrizy']
 
-        # Make the array which will contain this chunk of PDFs
-        pdfs = np.empty((nobj,nz), dtype='f4')
+            ug = data['u_mag'] - data['g_mag']
+            gr = data['g_mag'] - data['r_mag']
+            ri = data['r_mag'] - data['i_mag']
+            iz = data['i_mag'] - data['z_mag']
+            zy = data['z_mag'] - data['y_mag']
+            x += [ug, gr, ri, iz, zy]
 
-        # Note that we need metacalibrated versions of
-        # the point estimates.  That's why the 5 is there.
-        point_estimates = np.empty((5,nobj), dtype='f4')
+        elif features == [
+         'mag_u_lsst',
+         'mag_g_lsst',
+         'mag_r_lsst',
+         'mag_i_lsst',
+         'mag_u_lsst-mag_g_lsst',
+         'mag_g_lsst-mag_r_lsst',
+         'mag_r_lsst-mag_i_lsst',
+         'mag_i_lsst-mag_z_lsst',
+         'mag_z_lsst-mag_y_lsst']:
+            x =  [data[f'{b}_mag'] for b in 'ugriz']
+            ug = data['u_mag'] - data['g_mag']
+            gr = data['g_mag'] - data['r_mag']
+            ri = data['r_mag'] - data['i_mag']
+            iz = data['i_mag'] - data['z_mag']
+            zy = data['z_mag'] - data['y_mag']
+            x += [ug, gr, ri, iz, zy]
+        else:
+            raise ValueError("Need to re-code for the features you used")
 
-        # Loop through each object and make a fake PDF
-        # for it, saving it to the output space
-        for i,(mu,sigma) in enumerate(zip(medians,sigmas)):
-            pdf = scipy.stats.lognorm.pdf(z, s=sigma, scale=mu)
-            pdfs[i] = pdf
-            point_estimates[:,i] = mu
-        
+        x = np.vstack(x).T
+
+        pdfs = np.empty((nrow, nbin))
+        point_estimates = np.empty(nrow)
+
+
+        for i in range(nrow):
+            # Run all the tree regressors on each of the metacal
+            # variants
+            values = np.concatenate([T.get_vals(x[i]) for T in trees]).ravel()
+            pdfs[i], _ = np.histogram(values, bins=z)
+            pdfs[i] /= pdfs[i].sum()
+            point_estimates[i] = np.mean(values)
         return pdfs, point_estimates
 
     def write_output(self, output_file, start, end, pdfs, point_estimates):
@@ -182,11 +207,7 @@ class TXRandomPhotozPDF(PipelineStage):
         """
         group = output_file['pdf']
         group['pdf'][start:end] = pdfs
-        group['mu'][start:end] = point_estimates[0]
-        group['mu_1p'][start:end] = point_estimates[1]
-        group['mu_1m'][start:end] = point_estimates[2]
-        group['mu_2p'][start:end] = point_estimates[3]
-        group['mu_2m'][start:end] = point_estimates[4]
+        group['mu'][start:end] = point_estimates
 
 
 
@@ -219,20 +240,17 @@ class TXRandomPhotozPDF(PipelineStage):
         # if we are running under MPI and the output type is parallel
         f = self.open_output('photoz_pdfs', parallel=True)
             
+        z_mid = 0.5*(z[1:] + z[:-1])
         # Create the space for output data
-        nz = len(z)
+        nz = len(z_mid)
         group = f.create_group('pdf')
         group.create_dataset("z", (nz,), dtype='f4')
         group.create_dataset("pdf", (nobj,nz), dtype='f4')
         group.create_dataset("mu", (nobj,), dtype='f4')
-        group.create_dataset("mu_1p", (nobj,), dtype='f4')
-        group.create_dataset("mu_1m", (nobj,), dtype='f4')
-        group.create_dataset("mu_2p", (nobj,), dtype='f4')
-        group.create_dataset("mu_2m", (nobj,), dtype='f4')
 
         # One processor writes the redshift axis to output.
         if self.rank==0:
-            group['z'][:] = z
+            group['z'][:] = z_mid
 
         return f
 

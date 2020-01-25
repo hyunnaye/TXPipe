@@ -1,0 +1,15 @@
+-e git://github.com/LSSTDESC/ceci@minirunner#egg=ceci
+h5py
+pandas
+sacc
+pyccl
+numpy
+matplotlib
+-e git://github.com/LSSTDESC/gcr-catalogs#egg=GCRCatalogs
+scipy
+mlz_desc
+treecorr
+sklearn
+astropy
+healpy
+#pymaster

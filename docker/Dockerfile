@@ -1,58 +1,111 @@
-FROM lsstsqre/centos:7-stack-lsst_distrib-v15_0
-MAINTAINER EiffL <francois.lanusse@gmail.com>
+FROM python:3.7
+MAINTAINER joezuntz@googlemail.com
+#Joe's note to himself.  Compile this with: docker build -t joezuntz/cosmosis-base .
+#then docker push joezuntz/cosmosis-base
 
-######## Install ceci, and MPI tools, this should be part of the base image
-USER root
-RUN mkdir /build
+# Basic compilers and tools dependencies
+RUN apt-get update -y && apt-get install -y gcc g++ gfortran \
+    cmake swig wget make libopenblas-dev libchealpix-dev \
+    pkg-config curl \
+    && apt-get clean all
 
-RUN cd /build && wget http://www.mpich.org/static/downloads/3.2/mpich-3.2.tar.gz \
-  && tar xvzf mpich-3.2.tar.gz && cd /build/mpich-3.2 \
-  && ./configure && make -j4 && make install && make clean && rm -rf /build/*
+# Manual installation of mpich seems to be required to work on NERSC
+RUN mkdir /opt/mpich && cd /opt/mpich \
+    && wget http://www.mpich.org/static/downloads/3.3.1/mpich-3.3.1.tar.gz \
+    && tar xvzf mpich-3.3.1.tar.gz &&  cd mpich-3.3.1 && ./configure --disable-wrapper-rpath && make -j4 \
+    && make install && rm -rf /opt/mpich
 
-RUN cd /build && wget https://bitbucket.org/mpi4py/mpi4py/downloads/mpi4py-3.0.0.tar.gz \
-  && tar xvzf mpi4py-3.0.0.tar.gz
-RUN cd /build/mpi4py-3.0.0 && source /opt/lsst/software/stack/loadLSST.bash && setup lsst_distrib && \
-    python setup.py build && python setup.py install  && rm -rf /build/*
 
-ENV HDF5_MINOR_REL       hdf5-1.10.1
-ENV HDF5_SRC_URL         http://www.hdfgroup.org/ftp/HDF5/releases
+# other dependencies, some for matplotlib
+RUN apt-get update  && \
+	apt-get install -y  libcfitsio-dev  libfftw3-dev   git  libgsl-dev \
+    && apt-get clean all
 
-RUN cd /build/ && \
-    wget https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.1/src/hdf5-1.10.1.tar.gz ; \
-    tar -xvzf hdf5-1.10.1.tar.gz  --directory /usr/local/src                      ; \
-    cd /usr/local/src/hdf5-1.10.1                                                  ; \
-    ./configure --prefix=/usr/local/hdf5 --enable-parallel --enable-shared         ; \
-    make                                                                           ; \
-    make install                                                                   ; \
-    for f in /usr/local/hdf5/bin/* ; do ln -s $f /usr/local/bin ; done  && rm -rf /build/*
 
-RUN cd /build/ && source /opt/lsst/software/stack/loadLSST.bash && setup lsst_distrib && \
-    git clone https://github.com/h5py/h5py.git                                     ; \
-    cd h5py                                                                        ; \
-    export CC=mpicc                                                                ; \
-    export HDF5_DIR=/usr/local/hdf5                                                ; \
-    python setup.py configure --mpi                                                ; \
-    python setup.py build                                                          ; \
-    python setup.py install && rm -rf /build
+# Need to install manually because we want MPI-enabled version
+RUN mkdir /opt/hdf && cd /opt/hdf \
+    && wget https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.5/src/hdf5-1.10.5.tar.gz \
+    && tar xvf hdf5-1.10.5.tar.gz \
+    && cd hdf5-1.10.5 \
+    && ./configure --enable-parallel --prefix=/usr/local CC=mpicc \
+    && make \
+    && make install \
+    && rm -rf /opt/hdf
 
-RUN /sbin/ldconfig
 
-USER lsst
 
-RUN source /opt/lsst/software/stack/loadLSST.bash && setup lsst_distrib \
-    && pip install ruamel.yaml==0.13.13 cwlgen pyyaml descformats \
-    && pip install parsl==0.5.2 \
-    && pip install --no-deps git+https://github.com/LSSTDESC/ceci.git
-########################################################################
+# Also need a manual install of mpi4py so that it uses the right libraries - pip seems not to work
+RUN mkdir /opt/mpi4py && cd /opt/mpi4py \
+    && wget https://bitbucket.org/mpi4py/mpi4py/downloads/mpi4py-3.0.2.tar.gz \
+    && tar -zxvf mpi4py-3.0.2.tar.gz && cd mpi4py-3.0.2 && python setup.py install \
+    && rm -rf /opt/mpi4py
 
-# Install pipeline specific dependencies
-RUN source /opt/lsst/software/stack/loadLSST.bash && setup lsst_distrib \
-    && pip install fitsio TreeCorr
 
-# Install pipeline package itself
-RUN source /opt/lsst/software/stack/loadLSST.bash && setup lsst_distrib \
-    && pip install git+https://github.com/EiffL/TXPipe
+# Some env vars
+ENV HDF5_MPI ON
+ENV HDF5_USE_FILE_LOCKING FALSE
+ENV LD_LIBRARY_PATH /usr/local/lib
+ENV C_INCLUDE_PATH /usr/local/include
 
-COPY entrypoint.sh /entrypoint.sh
+# Ceci
 
-ENTRYPOINT ["bash", "/entrypoint.sh"]
+RUN pip install --no-cache-dir --upgrade pip
+
+# fitsio needs this to be installed first
+RUN pip install --no-cache-dir numpy==1.17
+
+# Basic python requirements
+RUN pip install --no-cache-dir \
+                Cython==0.29.13 \
+                nose==1.3.7 \
+                pyparsing==2.2.0 \
+                pyyaml==5.1.2 \
+                scikit-learn==0.21.3 \
+                setuptools==38.5.2 \
+                astropy==3.2.1 \
+                scipy==1.3.1 \
+                fitsio==0.9.11 \
+                healpy==1.12.9 \
+                treecorr \
+                descformats \
+                sacc \
+                mlz_desc
+
+# Install h5py, recompiling so that we use HDF5 with MPI
+RUN pip install --no-cache-dir --no-binary=h5py h5py==2.9.0
+
+RUN pip install --no-cache-dir  git+https://github.com/LSSTDESC/ceci@minirunner
+
+# Manual namaster install
+RUN mkdir -p /opt/namaster && cd /opt/namaster \
+    && git clone https://github.com/LSSTDESC/NaMaster \
+    && git clone https://github.com/Libsharp/libsharp \
+    && cd libsharp \
+    && autoconf \
+    && ./configure --enable-pic  --disable-openmp \
+    && make \
+    && cp auto/lib/* /usr/local/lib/ \
+    && cp auto/include/* /usr/local/include/ \
+    && cd ../NaMaster \
+    && ./configure --disable-openmp \
+    && make  \
+    && make install \
+    && python setup.py install \
+    && rm -rf /opt/namaster
+
+# Manual CCL install
+RUN cd /opt \
+    && git clone https://github.com/LSSTDESC/CCL.git \
+    && cd CCL \
+    && mkdir build \
+    && cd build \
+    && cmake .. \
+    && make \
+    && make install \
+    && cd .. \
+    && python setup.py install \
+    && rm -rf /opt/CCL
+
+
+WORKDIR /opt/txpipe
+CMD ["/bin/bash", "-l"]

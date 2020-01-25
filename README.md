@@ -1,10 +1,15 @@
 DESC 3x2pt Pipeline Stages
---------------------------
+==========================
 
 This is a collection of modules for the DESC 3x2pt pipeline.
 We will build up the modules needed for the analysis as shown in the Pipelines repository.
 
 It builds on the ceci repository for the infrastructure.
+
+Permissions
+-----------
+
+Email or Slack Joe Zuntz to be added to the development team.
 
 Goals
 -----
@@ -15,57 +20,129 @@ Goals
 - Perform and publish a DC2 3x2pt analysis.
 
 
-Installation
-------------
+Getting Dependencies
+--------------------
 
-Requires python3, numpy, scipy, pyyaml, fitsio, h5py (which in turn needs HDF5), and parsl.
+TXPipe requires python>=3.6.
 
-Needs the ceci DESC library on the python path (which is not quite stable enough to be worth a setup.py yet).
+**Dependencies on your laptop**
 
-On NERSC (Cori) - see the instructions below
+The various stages within it depend on the python packages listed in requirements.txt, and can be install using:
+```
+pip install -r requirements.txt
+```
 
-Cori
-----
+**NOTE** The current pipeline version needs the *minirunner* branch of *ceci*.  This is installed by requirements.txt
 
-These dependencies are all already prepared on cori - use this environment:
+The twopoint_fourier stage also requires NaMaster, which must be manually installed.  For testing, stick to a real-space analysis.
+
+To try a C_ell analysis, it can be installed from here:
+
+https://github.com/LSSTDESC/NaMaster/
+
+although there is a conda recipe to install it.  You will need to install the pymaster python library along with it.
+
+
+**Dependencies using Docker**
+
+In Docker, from the main directory, this will get you the newest version of the required dependencies:
 
 ```bash
-module swap PrgEnv-intel  PrgEnv-gnu
-module unload darshan
-module load hdf5-parallel/1.10.1
-module load python/3.6-anaconda-4.4
-module load cfitsio/3.370-reentrant
-source activate /global/projecta/projectdirs/lsst/groups/WL/users/zuntz/env
+docker pull joezuntz/txpipe
+docker run --rm -it -v$PWD:/opt/txpipe joezuntz/txpipe
 ```
 
-Input test data
----------------
+**Dependencies on NERSC's Cori**
 
-You can get input test data from here:
-```
-curl -O https://portal.nersc.gov/project/lsst/WeakLensing/mock_shear_catalog.fits
-curl -O https://portal.nersc.gov/project/lsst/WeakLensing/mock_photometry_catalog.hdf
+On cori, use Shifter to access dependencies.  On the login nodes, this will get you into the environment:
+
+```bash
+shifter --image docker:joezuntz/txpipe bash
 ```
 
-Or if running on NERSC see the commented out parts of test/test.yml
+You can then run individual TXPipe steps.
+
+If you want to run inside a job (interactive or batch) under MPI using srun, you do so *outside* the shifter call, like this:
+
+```bash
+srun -n 32 shifter --image docker:joezuntz/txpipe python3 -m txpipe ...
+```
+
+If you want to run pipelines under MPI, you can install a minimal environment on cori with just ceci inside (no other dependencies) like this:
+
+```bash
+source examples/nersc/setup
+python -m venv env
+source env/bin/activate
+pip install -e git://github.com/LSSTDESC/ceci@minirunner#egg=ceci
+```
+
+Then use shifter to run the actual jobs.
+
+
+
+Getting the code and some test data
+-----------------------------------
+
+Get the TXPipe code like this:
+```bash
+git clone https://github.com/LSSTDESC/TXPipe
+cd TXPipe
+```
+
+You can get some input test data like this:
+
+```bash
+
+mkdir -p data/example/inputs
+cd data/example/inputs
+curl -O https://portal.nersc.gov/project/lsst/WeakLensing/shear_catalog.hdf5
+curl -O https://portal.nersc.gov/project/lsst/WeakLensing/photometry_catalog.hdf5
+curl -O https://portal.nersc.gov/project/lsst/WeakLensing/sample_cosmodc2_w10year_errors.dat
+curl -O https://portal.nersc.gov/project/lsst/WeakLensing/cosmoDC2_trees_i25.3.npy
+curl -O https://portal.nersc.gov/project/lsst/WeakLensing/exposures.hdf5
+curl -O https://portal.nersc.gov/project/lsst/WeakLensing/star_catalog.hdf5
+
+cd ../../..
+```
+
 
 Running the pipeline
 --------------------
 
-Make sure that the ceci directory is on your PYTHONPATH and ceci/bin is on your PATH.
-Then you can run:
+Once you have installed the dependecies you can run this using the test data you downloaded above
 
 ```bash
-ceci test/test.yml
+ceci examples/laptop.yml
 ```
 
-or on Cori:
+to run the implemented stages.
+
+You can get a list of the individual commands that will be run like this:
+
 ```bash
-salloc -N 1 -q interactive -C haswell -t 0:30:00
-ceci test/cori-interactive.yml
+ceci --dry-run examples/laptop.yml
 ```
 
-to run the implemented stages
+so that you can run and examine them individually.
+
+
+
+
+Larger runs
+-----------
+
+Example larger runs, which can be run on NERSC under interactive jobs (for now) can be run by doing:
+```bash
+# To get an interactive job:
+salloc -N 2  -q interactive -C haswell -t 01:00:00 -A m1727
+# <wait for allocation>
+ceci examples/2.1.1i.yml
+```
+
+A larger run is in `examples/2.1i.yml`.
+
+
 
 Implementation
 --------------
@@ -81,11 +158,11 @@ Each pipeline stage is implemented as a python class inheriting from ceci.Pipeli
 Some implementation notes:
 
 - Our catalogs will be large. Wherever possible stages should operate on chunks of their input data at once. ceci has some methods for this (see README)
-- Pipeline stages shouldn't copy existing columns to new data.
-- No ASCII output allowed!
-- Python 3.6
+- Pipeline stages shouldn't copy existing columns to new data, in general.
+- Structure your output clearly!  No header-less text files!
+- Python 3.6+
 - We will do code review
-- One file per box (?)
+
 
 Pipeline Stage Methods
 ----------------------
@@ -94,34 +171,32 @@ The pipeline stages can use these methods to interact with the pipeline:
 
 Basic tools to find the file path:
 
-- self.get_input(tag)
-- self.get_output(tag)
+- `self.get_input(tag)`
+- `self.get_output(tag)`
 
-Get base class to find and open the file for you
+Get base class to find and open the file for you:
 
-- self.open_input(tag, **kwargs)
-- self.open_output(tag, **kwargs)
+- `self.open_input(tag, **kwargs)`
+- `self.open_output(tag, parallel=True, **kwargs)`
 
 
 Look for a section in a yaml input file tagged "config"
 and read it.  If the config_options class variable exists in the class
 then it checks those options are set or uses any supplied defaults:
 
-- self.config['name_of_option']
+- `self.config['name_of_option']`
 
 Parallelization tools - MPI attributes:
 
-- self.rank
-- self.size
-- self.comm
+- `self.rank`
+- `self.size`
+- `self.comm`
 
 (Parallel) IO tools - reading data in chunks, splitting up 
 according to MPI rank:
 
-- self.iterate_fits(tag, hdunum, cols, chunk_rows)
-- self.iterate_hdf(tag, group_name, cols, chunk_rows)
-
-
+- `self.iterate_fits(tag, hdunum, cols, chunk_rows)`
+- `self.iterate_hdf(tag, group_name, cols, chunk_rows)`
 
 
 
